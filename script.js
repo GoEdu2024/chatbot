@@ -43,23 +43,27 @@ const generateResponse = async (chatElement) => {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`  // Adicione a chave da API no cabeçalho
-        },
-        body: JSON.stringify(requestBody)
-    });
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
 
+        // Verifique se a resposta da API não foi bem-sucedida
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Erro da API: ${errorData.error.message}`);
+        }
 
         const data = await response.json();
-        const botMessage = data.candidates?.[0]?.output || "Não foi possível gerar uma resposta.";  // Ajuste isso conforme a resposta da API
+        const botMessage = data.candidates?.[0]?.output || "Não foi possível gerar uma resposta.";
 
         // Exibe o texto de resposta no chat
         messageElement.textContent = botMessage;
 
     } catch (error) {
-        // Em caso de erro
+        // Em caso de erro, mostre no console e na interface do usuário
         messageElement.textContent = "Ocorreu um erro ao processar a resposta.";
-        console.error("Erro na API do Google Gemini:", error);
+        console.error("Erro na API do Google Gemini:", error.message);
     }
 
     // Rolar até o final da janela de chat
