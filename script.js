@@ -48,14 +48,23 @@ const generateResponse = async (chatElement) => {
             body: JSON.stringify(requestBody)
         });
 
-        // Verifique se a resposta da API não foi bem-sucedida
+        // Verifique se a resposta não foi bem-sucedida
         if (!response.ok) {
             const errorData = await response.json();
+            console.error("Erro na API:", errorData);
             throw new Error(`Erro da API: ${errorData.error.message}`);
         }
 
+        // Log da resposta completa da API para depuração
         const data = await response.json();
-        const botMessage = data.candidates?.[0]?.output || "Não foi possível gerar uma resposta.";
+        console.log("Resposta completa da API:", data);
+
+        // Verifica se há candidatos na resposta
+        if (!data.candidates || data.candidates.length === 0) {
+            throw new Error("Nenhuma resposta foi gerada.");
+        }
+
+        const botMessage = data.candidates[0].output || "Não foi possível gerar uma resposta.";
 
         // Exibe o texto de resposta no chat
         messageElement.textContent = botMessage;
