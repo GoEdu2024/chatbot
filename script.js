@@ -24,25 +24,34 @@ const generateResponse = async (chatElement) => {
     // Mostra mensagem de "pensando" enquanto espera a resposta da API
     messageElement.textContent = "Pensando...";
 
-    // Chave da API do Google Gemini
-    const apiKey = 'AIzaSyDbRN4-MzyelPbul3vBAVwI_PEoVeX9wws';
-    
-    // Fazendo a requisição à API
+    // A sua chave da API
+    const apiKey = 'YOUR_API_KEY'; // Substitua pela sua chave de API correta
+
+    // Corpo da requisição
+    const requestBody = {
+        contents: [
+            {
+                parts: [
+                    { text: userMessage }  // A mensagem enviada pelo usuário
+                ]
+            }
+        ]
+    };
+
+    // Fazendo a requisição à API do Google Gemini
     try {
-        const response = await fetch('https://api.google-gemini.com/v1/chat', {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                input: userMessage, // Mensagem do usuário
-                language: "pt-BR"   // Linguagem definida como português do Brasil
-            })
+            body: JSON.stringify(requestBody)
         });
 
         const data = await response.json();
-        const botMessage = data.response;  // Ajuste isso para o formato correto retornado pela API do Gemini
+        const botMessage = data.candidates[0].output;  // Ajuste isso conforme a resposta da API
+
+        // Exibe o texto de resposta no chat
         messageElement.textContent = botMessage;
 
     } catch (error) {
@@ -53,7 +62,7 @@ const generateResponse = async (chatElement) => {
 
     // Rolar até o final da janela de chat
     chatbox.scrollTo(0, chatbox.scrollHeight);
-}
+};
 
 // Função para lidar com o envio de mensagens do usuário
 const handleChat = () => {
