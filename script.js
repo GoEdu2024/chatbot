@@ -25,7 +25,7 @@ const generateResponse = async (chatElement) => {
     messageElement.textContent = "Pensando...";
 
     // A sua chave da API
-    const apiKey = 'YOUR_API_KEY'; // Substitua pela sua chave de API correta
+    const apiKey = 'AIzaSyDbRN4-MzyelPbul3vBAVwI_PEoVeX9wws'; // Substitua pela sua chave de API correta
 
     // Corpo da requisição
     const requestBody = {
@@ -40,7 +40,7 @@ const generateResponse = async (chatElement) => {
 
     // Fazendo a requisição à API do Google Gemini
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
