@@ -7,6 +7,7 @@ const sendChatBtn = document.querySelector(".chat-input span");
 let userMessage = null;
 const inputInitHeight = chatInput.scrollHeight;
 
+// Função para criar uma mensagem no chat
 const createChatLi = (message, className) => {
     const chatLi = document.createElement("li");
     chatLi.classList.add("chat", `${className}`);
@@ -16,50 +17,84 @@ const createChatLi = (message, className) => {
     return chatLi;
 }
 
-const generateResponse = (chatElement) => {
+// Função para gerar resposta da API do Google Gemini
+const generateResponse = async (chatElement) => {
     const messageElement = chatElement.querySelector("p");
 
-    messageElement.textContent = "The answer is yes";
+    // Mostra mensagem de "pensando" enquanto espera a resposta da API
+    messageElement.textContent = "Pensando...";
 
+    // Chave da API do Google Gemini
+    const apiKey = 'AIzaSyDbRN4-MzyelPbul3vBAVwI_PEoVeX9wws';
+    
+    // Fazendo a requisição à API
+    try {
+        const response = await fetch('https://api.google-gemini.com/v1/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                input: userMessage, // Mensagem do usuário
+                language: "pt-BR"   // Linguagem definida como português do Brasil
+            })
+        });
+
+        const data = await response.json();
+        const botMessage = data.response;  // Ajuste isso para o formato correto retornado pela API do Gemini
+        messageElement.textContent = botMessage;
+
+    } catch (error) {
+        // Em caso de erro
+        messageElement.textContent = "Ocorreu um erro ao processar a resposta.";
+        console.error("Erro na API do Google Gemini:", error);
+    }
+
+    // Rolar até o final da janela de chat
     chatbox.scrollTo(0, chatbox.scrollHeight);
 }
 
+// Função para lidar com o envio de mensagens do usuário
 const handleChat = () => {
     userMessage = chatInput.value.trim();
     if(!userMessage) return;
 
-    // Clear the input textarea and set its height to default
+    // Limpa a área de entrada e ajusta sua altura
     chatInput.value = "";
     chatInput.style.height = `${inputInitHeight}px`;
 
-    // Append the user's message to the chatbox
+    // Adiciona a mensagem do usuário ao chat
     chatbox.appendChild(createChatLi(userMessage, "outgoing"));
     chatbox.scrollTo(0, chatbox.scrollHeight);
 
+    // Simula a resposta após um pequeno delay
     setTimeout(() => {
-        // Display "Thinking..." message while waiting for the response
-        const incomingChatLi = createChatLi("Thinking...", "incoming");
+        // Mostra a mensagem de "Pensando..." enquanto aguarda a resposta da API
+        const incomingChatLi = createChatLi("Pensando...", "incoming");
         chatbox.appendChild(incomingChatLi);
         chatbox.scrollTo(0, chatbox.scrollHeight);
         generateResponse(incomingChatLi);
     }, 600);
 }
 
+// Ajusta a altura da área de entrada ao digitar
 chatInput.addEventListener("input", () => {
-    // Adjust the height of the input textarea based on its content
     chatInput.style.height = `${inputInitHeight}px`;
     chatInput.style.height = `${chatInput.scrollHeight}px`;
 });
 
+// Lida com a tecla Enter
 chatInput.addEventListener("keydown", (e) => {
-    // If Enter key is pressed without Shift key and the window
-    // width is greater than 800px, handle the chat
     if(e.key === "Enter" && !e.shiftKey && window.innerWidth > 800) {
         e.preventDefault();
         handleChat();
     }
 });
 
+// Botão para enviar mensagem
 sendChatBtn.addEventListener("click", handleChat);
+
+// Botão para fechar o chatbot
 closeBtn.addEventListener("click", () => document.body.classList.remove("show-chatbot"));
 chatbotToggler.addEventListener("click", () => document.body.classList.toggle("show-chatbot"));
