@@ -40,16 +40,18 @@ const generateResponse = async (chatElement) => {
 
     // Fazendo a requisição à API do Google Gemini
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        });
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`  // Adicione a chave da API no cabeçalho
+        },
+        body: JSON.stringify(requestBody)
+    });
+
 
         const data = await response.json();
-        const botMessage = data.candidates[0].output;  // Ajuste isso conforme a resposta da API
+        const botMessage = data.candidates?.[0]?.output || "Não foi possível gerar uma resposta.";  // Ajuste isso conforme a resposta da API
 
         // Exibe o texto de resposta no chat
         messageElement.textContent = botMessage;
