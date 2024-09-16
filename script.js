@@ -55,16 +55,11 @@ const generateResponse = async (chatElement) => {
             throw new Error(`Erro da API: ${errorData.error.message}`);
         }
 
-        // Log da resposta completa da API para depuração
         const data = await response.json();
         console.log("Resposta completa da API:", data);
 
-        // Verifica se há candidatos na resposta
-        if (!data.candidates || data.candidates.length === 0) {
-            throw new Error("Nenhuma resposta foi gerada.");
-        }
-
-        const botMessage = data.candidates[0].output || "Não foi possível gerar uma resposta.";
+        // Agora estamos acessando a resposta corretamente
+        const botMessage = data.candidates?.[0]?.content?.parts?.[0]?.text || "Não foi possível gerar uma resposta.";
 
         // Exibe o texto de resposta no chat
         messageElement.textContent = botMessage;
@@ -78,6 +73,7 @@ const generateResponse = async (chatElement) => {
     // Rolar até o final da janela de chat
     chatbox.scrollTo(0, chatbox.scrollHeight);
 };
+
 
 // Função para lidar com o envio de mensagens do usuário
 const handleChat = () => {
